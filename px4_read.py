@@ -11,12 +11,12 @@ import rosidl_runtime_py.utilities
 from rclpy.serialization import deserialize_message
 
 from px4_msgs.msg import SensorGyro
-from px4_msgs.msg import SensorCombined
+from px4_msgs.msg import SensorCombined, SensorAccel
 
 import datetime
 
 
-folder_path = 'data/6m_1'
+folder_path = 'data/80m_1'
 
 def get_db3_reader(base_path, folder_clue):
     db3_files = glob.glob(os.path.join(base_path, folder_clue, '*.db3'))
@@ -80,7 +80,42 @@ def plot_gyro_from_df(gyro_df):
     plt.title("Gyroscope")
     plt.xlabel("time")
     plt.ylabel("rad sec")
-    plt.show()
+    # plt.show()
+
+
+def get_acc_df_from_db3_reader(rosbag_reader):
+    msg_type = rosidl_runtime_py.utilities.get_message('px4_msgs/msg/SensorAccel')
+    rosbag_reader.seek(0)
+    messages = []
+    while rosbag_reader.has_next():
+        (topic_name, data, t) = rosbag_reader.read_next()
+        if topic_name == '/fmu/out/sensor_accel':
+            msg = deserialize_message(data, msg_type)
+            t_sample = msg.timestamp_sample
+            x = msg.x
+            y = msg.y
+            z = msg.z
+            temperature = msg.temperature
+            messages.append({
+                'timestamp': t,
+                'timestamp_sample': t_sample,
+                'x': x,
+                'y': y,
+                'z': z,
+                'temperature': temperature
+            })
+    return pd.DataFrame(messages)
+
+
+def plot_acc_from_df(acc_df):
+    plt.figure(figsize=(10, 6))
+    plt.plot(acc_df['timestamp_sample'], acc_df['x'], color='red')
+    plt.plot(acc_df['timestamp_sample'], acc_df['y'], color='green')
+    plt.plot(acc_df['timestamp_sample'], acc_df['z'], color='blue')
+    plt.title("Accelerometer")
+    plt.xlabel("time")
+    plt.ylabel("m sec^2")
+    # plt.show()
 
 
 def get_sensor_combined_df_from_db3_reader(rosbag_reader):
@@ -113,7 +148,7 @@ def plot_sensor_combined_from_df(sc_df):
     plt.title("Gyroscope")
     plt.xlabel("time")
     plt.ylabel("rad sec")
-    plt.show()
+    # plt.show()
 
     plt.figure(figsize=(10, 6))
     plt.plot(sc_df['timestamp_sample'], sc_df['acc_x'], color='red')
@@ -122,24 +157,49 @@ def plot_sensor_combined_from_df(sc_df):
     plt.title("Accelerometer")
     plt.xlabel("time")
     plt.ylabel("m sec^2")
-    plt.show()
+    # plt.show()
 
+
+def get_baro_df_from_db3_reader(rosbag_reader):
+    msg_type = rosidl_runtime_py.utilities.get_message('px4_msgs/msg/SensorBaro')
+    rosbag_reader.seek(0)
+    messages = []
+    while rosbag_reader.has_next():
+        (topic_name, data, t) = rosbag_reader.read_next()
+        if topic_name == '/fmu/out/sensor_baro':
+            msg = deserialize_message(data, msg_type)
+            t_sample = msg.timestamp_sample
+            pressure = msg.pressure
+            temperature = msg.temperature
+            messages.append({
+                'timestamp': t,
+                'timestamp_sample': t_sample,
+                'pressure': pressure,
+                'temperature': temperature
+            })
+    return pd.DataFrame(messages)
+
+
+def plot_baro_from_df(baro_df):
+    plt.figure(figsize=(10, 6))
+    plt.plot(baro_df['timestamp_sample'], baro_df['pressure'], color='blue')
+    plt.title("Pressure")
+    plt.xlabel("time")
+    plt.ylabel("Pa")
+    # plt.show()
 
 
 df_entry_num = 0
 db3_reader = get_db3_reader(folder_path, 'sensor_bag*')
-px4_df = get_topic_df_from_db3_reader('/fmu/out/sensor_combined', 'px4_msgs/msg/SensorCombined', db3_reader)
+px4_df = get_topic_df_from_db3_reader('/fmu/out/sensor_baro', 'px4_msgs/msg/SensorBaro', db3_reader)
 
-
-sc_df = get_sensor_combined_df_from_db3_reader(db3_reader)
-plot_sensor_combined_from_df(sc_df)
 
 print("Dataframe shape", px4_df.shape)
 msg = px4_df['data'][df_entry_num]
-print("px4 message:", type(msg.accelerometer_m_s2), msg.accelerometer_m_s2)
+print("px4 message:", type(msg), msg)
 
 # SensorCombined.tim
-
+# SensorAccel
 
 
 
@@ -154,11 +214,19 @@ print("Arrival timestamp: ", px4_df['timestamp'][df_entry_num])
 
 
 
+baro_df = get_baro_df_from_db3_reader(db3_reader)
+plot_baro_from_df(baro_df)
 
-# ## Gyro plot
-# gyro_df = get_gyro_df_from_db3_reader(db3_reader)
-# print(gyro_df.head())
-# plot_gyro_from_df(gyro_df)
+gyro_df = get_gyro_df_from_db3_reader(db3_reader)
+plot_gyro_from_df(gyro_df)
+
+acc_df = get_acc_df_from_db3_reader(db3_reader)
+plot_acc_from_df(acc_df)
+
+sc_df = get_sensor_combined_df_from_db3_reader(db3_reader)
+plot_sensor_combined_from_df(sc_df)
+
+plt.show()
 
 
 # lidar_msg = get_single_ros_msg_from_topic_df(lidar_df, 0)
