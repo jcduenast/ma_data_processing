@@ -46,39 +46,52 @@ def get_topic_df_from_db3_reader(ros_topic, ros_msg_type, rosbag_reader):
             msg = deserialize_message(data, msg_type)
             messages.append({
                 'timestamp': t,
-                'data': msg  # You'll likely want to unpack the message here
+                'data': msg
             })
 
     return pd.DataFrame(messages)
 
 
+def filter_out_points(np_frame):
+    return np_frame
+
+
+def get_single_ros_msg_from_topic_df(topic_df, msg_num):
+    return topic_df['data'][msg_num]
+
+
+def get_lidar_np_frame_from_msg(msg):
+    return point_cloud2.read_points_numpy(msg, field_names=("x", "y", "z"), skip_nans=True)
+
+
+def plot_np_3d_points(np_array):##
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    ax.scatter(np_array[:,0], np_array[:,1], np_array[:,2], marker='o')
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+    plt.show()
+
+frame_num = 4000 # the frame in time to be looked at
 db3_reader = get_db3_reader(folder_path)
+lidar_df = get_topic_df_from_db3_reader('/bf/points_raw', 'sensor_msgs/msg/PointCloud2', db3_reader)
+print("This file has:", lidar_df.shape[0], "frames. Consulting frame ", frame_num)
+lidar_msg = get_single_ros_msg_from_topic_df(lidar_df, frame_num)
+np_array = get_lidar_np_frame_from_msg(lidar_msg)
+print("Frame timestamp   : ", lidar_msg.header.stamp.sec + lidar_msg.header.stamp.nanosec / 1e9)
+print("Message time stamp: ", lidar_df['timestamp'][frame_num])
+print("Amount of points in msg", np_array.shape[0])
+plot_np_3d_points(np_array)
+
+# datetime_start = datetime.datetime.fromtimestamp(lidar_df['timestamp'][0] / 1e9)
+# datetime_end = datetime.datetime.fromtimestamp(lidar_df['timestamp'][lidar_df.shape[0]-1] / 1e9)
+
+# print(datetime_start, "to", datetime_end )
+
 
 # ## Search for the topic and msg needed
 # topics_types = db3_reader.get_all_topics_and_types()
 # print("Topics in the bag:")
 # for topic in topics_types:
 #     print(f"{topic.name}: {topic.type}")
-
-# dataframe
-lidar_df = get_topic_df_from_db3_reader('/bf/points_raw', 'sensor_msgs/msg/PointCloud2', db3_reader)
-print(lidar_df.head())
-
-
-
-lidar_frame = lidar_df['data'][4000]
-print(type(lidar_frame))
-
-points = list(point_cloud2.read_points(lidar_frame, field_names=("x", "y", "z"), skip_nans=True))
-print("points in list", len(points))
-print(points[0])
-
-
-print("This file has:", lidar_df.shape[0], "frames.")
-
-datetime_start = datetime.datetime.fromtimestamp(lidar_df['timestamp'][0] / 1e9)
-datetime_end = datetime.datetime.fromtimestamp(lidar_df['timestamp'][lidar_df.shape[0]-1] / 1e9)
-
-print(datetime_start, "to", datetime_end )
-
-
