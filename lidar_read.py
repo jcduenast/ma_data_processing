@@ -79,6 +79,7 @@ lidar_df = get_topic_df_from_db3_reader('/bf/points_raw', 'sensor_msgs/msg/Point
 print("This file has:", lidar_df.shape[0], "frames. Consulting frame ", frame_num)
 lidar_msg = get_single_ros_msg_from_topic_df(lidar_df, frame_num)
 np_array = get_lidar_np_frame_from_msg(lidar_msg)
+# print("---------------------------------------------px4 message:", type(lidar_msg.header), lidar_msg.header)
 print("Frame timestamp   : ", lidar_msg.header.stamp.sec + lidar_msg.header.stamp.nanosec / 1e9)
 print("Message time stamp: ", lidar_df['timestamp'][frame_num])
 print("Amount of points in msg", np_array.shape[0])
@@ -95,3 +96,24 @@ plot_np_3d_points(np_array)
 # print("Topics in the bag:")
 # for topic in topics_types:
 #     print(f"{topic.name}: {topic.type}")
+
+# /absolute_pose: geometry_msgs/msg/Pose
+# /bf/points_raw: sensor_msgs/msg/PointCloud2
+# /drone_acceleration: geometry_msgs/msg/Vector3Stamped
+# /drone_angular_rate: geometry_msgs/msg/Vector3Stamped
+# /drone_attitude: geometry_msgs/msg/QuaternionStamped
+# /drone_fused_height: std_msgs/msg/Float32
+# /drone_velocity: geometry_msgs/msg/Vector3Stamped
+# /estimator/radar_pointcloud: sensor_msgs/msg/PointCloud2
+# /fix: sensor_msgs/msg/NavSatFix
+# /gps_heading: geometry_msgs/msg/Vector3Stamped
+# /imu/calibration_status/accelerometer: std_msgs/msg/UInt8
+# /imu/calibration_status/gyroscope: std_msgs/msg/UInt8
+# /imu/calibration_status/magnetometer: std_msgs/msg/UInt8
+# /imu/imu: sensor_msgs/msg/Imu
+# /imu/mag: sensor_msgs/msg/MagneticField
+# /srr308/altitude: std_msgs/msg/Float32
+# /srr308/altitude_point: sensor_msgs/msg/PointCloud2
+# /srr308/pointcloud: sensor_msgs/msg/PointCloud2
+# /tf: tf2_msgs/msg/TFMessage
+# /vel: geometry_msgs/msg/TwistStamped
