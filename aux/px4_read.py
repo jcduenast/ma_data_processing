@@ -16,8 +16,6 @@ from px4_msgs.msg import SensorCombined, SensorAccel
 import datetime
 
 
-folder_path = 'data/80m_1'
-
 def get_db3_reader(base_path, folder_clue):
     db3_files = glob.glob(os.path.join(base_path, folder_clue, '*.db3'))
     if not db3_files:
@@ -189,62 +187,33 @@ def plot_baro_from_df(baro_df):
     # plt.show()
 
 
-df_entry_num = 0
-db3_reader = get_db3_reader(folder_path, 'sensor_bag*')
-px4_df = get_topic_df_from_db3_reader('/fmu/out/sensor_baro', 'px4_msgs/msg/SensorBaro', db3_reader)
+if(__name__) == "__main__":
+    folder_path = 'data/80m_1'
 
+    df_entry_num = 0
+    db3_reader = get_db3_reader(folder_path, 'sensor_bag*')
+    px4_df = get_topic_df_from_db3_reader('/fmu/out/sensor_baro', 'px4_msgs/msg/SensorBaro', db3_reader)
 
-print("Dataframe shape", px4_df.shape)
-msg = px4_df['data'][df_entry_num]
-print("px4 message:", type(msg), msg)
+    print("Dataframe shape", px4_df.shape)
+    msg = px4_df['data'][df_entry_num]
+    print("px4 message:", type(msg), msg)
 
-# SensorCombined.tim
-# SensorAccel
+    print("Sample timestamp : ", msg.timestamp)
+    # print("Frame timestamp   : ", single_msg.header.stamp.sec + single_msg.header.stamp.nanosec / 1e9)
+    print("Arrival timestamp: ", px4_df['timestamp'][df_entry_num])
 
+    baro_df = get_baro_df_from_db3_reader(db3_reader)
+    plot_baro_from_df(baro_df)
 
+    gyro_df = get_gyro_df_from_db3_reader(db3_reader)
+    plot_gyro_from_df(gyro_df)
 
+    acc_df = get_acc_df_from_db3_reader(db3_reader)
+    plot_acc_from_df(acc_df)
 
+    sc_df = get_sensor_combined_df_from_db3_reader(db3_reader)
+    plot_sensor_combined_from_df(sc_df)
 
+    plt.show()
 
-print("Sample timestamp : ", msg.timestamp)
-# print("Frame timestamp   : ", single_msg.header.stamp.sec + single_msg.header.stamp.nanosec / 1e9)
-print("Arrival timestamp: ", px4_df['timestamp'][df_entry_num])
-
-
-
-
-
-baro_df = get_baro_df_from_db3_reader(db3_reader)
-plot_baro_from_df(baro_df)
-
-gyro_df = get_gyro_df_from_db3_reader(db3_reader)
-plot_gyro_from_df(gyro_df)
-
-acc_df = get_acc_df_from_db3_reader(db3_reader)
-plot_acc_from_df(acc_df)
-
-sc_df = get_sensor_combined_df_from_db3_reader(db3_reader)
-plot_sensor_combined_from_df(sc_df)
-
-plt.show()
-
-
-# lidar_msg = get_single_ros_msg_from_topic_df(lidar_df, 0)
-# np_array = get_lidar_np_frame_from_msg(lidar_msg)
-# print("Amount of points in msg", np_array.shape[0])
-# plot_np_3d_points(np_array)
-
-# print("This file has:", lidar_df.shape[0], "frames.")
-
-# datetime_start = datetime.datetime.fromtimestamp(lidar_df['timestamp'][0] / 1e9)
-# datetime_end = datetime.datetime.fromtimestamp(lidar_df['timestamp'][lidar_df.shape[0]-1] / 1e9)
-
-# print(datetime_start, "to", datetime_end )
-
-
-# # Search for the topic and msg needed
-# topics_types = db3_reader.get_all_topics_and_types()
-# print("Topics in the bag:")
-# for topic in topics_types:
-#     print(f"{topic.name}: {topic.type}")
 

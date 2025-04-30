@@ -5,7 +5,6 @@ import os
 from matplotlib import pyplot as plt
 import numpy as np
 
-folder_path = 'data/6m_1/gpx'
 
 def get_df_from_gpx(gpx_path):
     # Load the file
@@ -62,18 +61,21 @@ def plot_gps_altitude_from_gps_df(gps_df):
     plt.show()
 
 
-gpx_files = glob.glob(os.path.join(folder_path, '*.gpx'))
-if not gpx_files:
-    raise FileNotFoundError("No .gpx file found in the specified folder.")
-gpx_file_path = gpx_files[0]
+if(__name__) == "__main__":
+    folder_path = 'data/80m_1'
+    gpx_files = glob.glob(os.path.join(folder_path, '*.gpx'))
+    if not gpx_files:
+        raise FileNotFoundError("No .gpx file found in the specified folder.")
+    gpx_file_path = gpx_files[0]
 
-df = get_df_from_gpx(gpx_file_path)
-# df = df[['latitude', 'longitude']]
+    df = get_df_from_gpx(gpx_file_path)
+    # df = df[['latitude', 'longitude']]
+    print("Data size", df.shape)
 
-plot_gps_from_df(df)
-plot_speed_from_gps_df(df)
-plot_gps_altitude_from_gps_df(df)
+    plot_gps_from_df(df)
+    plot_speed_from_gps_df(df)
+    plot_gps_altitude_from_gps_df(df)
 
-# df.plot()
-# plt.show()
+    # df.plot()
+    # plt.show()
 
