@@ -171,7 +171,7 @@ def get_baro_df_from_db3_reader(rosbag_reader):
             temperature = msg.temperature
             messages.append({
                 'timestamp': t,
-                'timestamp_sample': t_sample,
+                'timestamp_sample': t_sample / 1e6,
                 'pressure': pressure,
                 'temperature': temperature
             })
