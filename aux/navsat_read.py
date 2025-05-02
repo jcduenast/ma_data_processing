@@ -172,7 +172,7 @@ def get_speed_from_navsat_velocity_df(vel_df):
     return np.array(speed)
 
 def plot_speed_from_np(timestamps, speed_array):
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 4))
     plt.plot(timestamps, speed_array, color='red')
     plt.title("Linear velocity")
     plt.xlabel("time [s]")
