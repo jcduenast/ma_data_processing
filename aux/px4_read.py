@@ -188,7 +188,7 @@ def plot_baro_from_df(baro_df):
 
 
 if(__name__) == "__main__":
-    folder_path = 'data/80m_1'
+    folder_path = 'data/50m_2'
 
     df_entry_num = 0
     db3_reader = get_db3_reader(folder_path, 'sensor_bag*')
@@ -203,16 +203,17 @@ if(__name__) == "__main__":
     print("Arrival timestamp: ", px4_df['timestamp'][df_entry_num])
 
     baro_df = get_baro_df_from_db3_reader(db3_reader)
-    plot_baro_from_df(baro_df)
+    print("first pressure at", folder_path, ":", baro_df['pressure'][0])
+    # plot_baro_from_df(baro_df)
 
-    gyro_df = get_gyro_df_from_db3_reader(db3_reader)
-    plot_gyro_from_df(gyro_df)
+    # gyro_df = get_gyro_df_from_db3_reader(db3_reader)
+    # plot_gyro_from_df(gyro_df)
 
-    acc_df = get_acc_df_from_db3_reader(db3_reader)
-    plot_acc_from_df(acc_df)
+    # acc_df = get_acc_df_from_db3_reader(db3_reader)
+    # plot_acc_from_df(acc_df)
 
-    sc_df = get_sensor_combined_df_from_db3_reader(db3_reader)
-    plot_sensor_combined_from_df(sc_df)
+    # sc_df = get_sensor_combined_df_from_db3_reader(db3_reader)
+    # plot_sensor_combined_from_df(sc_df)
 
     plt.show()
 
