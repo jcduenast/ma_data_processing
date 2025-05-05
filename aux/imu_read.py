@@ -141,3 +141,10 @@ if(__name__) == "__main__":
     mag_df = get_mag_df_from_db3_reader(db3_ROSBAG_reader)
     plot_mag_from_df(mag_df)
     plt.show()
+    mean_hz = []
+    for i in range(imu_df.shape[0]-1):
+        mean_hz.append(imu_df['timestamp_sample'][i+1]-imu_df['timestamp_sample'][i])
+    print("mean ms:", np.mean(mean_hz))
+    print(imu_df['timestamp_sample'][0])
+    
+

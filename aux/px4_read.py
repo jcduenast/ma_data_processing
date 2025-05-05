@@ -61,7 +61,7 @@ def get_gyro_df_from_db3_reader(rosbag_reader):
             temperature = msg.temperature
             messages.append({
                 'timestamp': t,
-                'timestamp_sample': t_sample,
+                'timestamp_sample': t_sample / 1e6,
                 'x': x,
                 'y': y,
                 'z': z,
@@ -96,7 +96,7 @@ def get_acc_df_from_db3_reader(rosbag_reader):
             temperature = msg.temperature
             messages.append({
                 'timestamp': t,
-                'timestamp_sample': t_sample,
+                'timestamp_sample': t_sample / 1e6,
                 'x': x,
                 'y': y,
                 'z': z,
@@ -128,7 +128,7 @@ def get_sensor_combined_df_from_db3_reader(rosbag_reader):
             acc_arr = msg.accelerometer_m_s2
             messages.append({
                 'timestamp': t,
-                'timestamp_sample': msg.timestamp,
+                'timestamp_sample': msg.timestamp / 1e6,
                 'gyro_x': gyro_arr[0],
                 'gyro_y': gyro_arr[1],
                 'gyro_z': gyro_arr[2],
@@ -206,14 +206,14 @@ if(__name__) == "__main__":
     print("first pressure at", folder_path, ":", baro_df['pressure'][0])
     # plot_baro_from_df(baro_df)
 
-    # gyro_df = get_gyro_df_from_db3_reader(db3_reader)
-    # plot_gyro_from_df(gyro_df)
+    gyro_df = get_gyro_df_from_db3_reader(db3_reader)
+    plot_gyro_from_df(gyro_df)
 
-    # acc_df = get_acc_df_from_db3_reader(db3_reader)
-    # plot_acc_from_df(acc_df)
+    acc_df = get_acc_df_from_db3_reader(db3_reader)
+    plot_acc_from_df(acc_df)
 
-    # sc_df = get_sensor_combined_df_from_db3_reader(db3_reader)
-    # plot_sensor_combined_from_df(sc_df)
+    sc_df = get_sensor_combined_df_from_db3_reader(db3_reader)
+    plot_sensor_combined_from_df(sc_df)
 
     plt.show()
 
