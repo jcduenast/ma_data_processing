@@ -176,3 +176,7 @@ cython_debug/
 # rosdata
 *.mp4
 *.db3
+*.png
+*.eps
+*.csv
+*.pkl
